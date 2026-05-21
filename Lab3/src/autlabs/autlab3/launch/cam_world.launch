@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!--
+  cam_world.launch - Actividad 2 del Lab 3 (Mejorada)
+  Lanza cam.world con el Turtlebot3 en el centro y 5 CamBots
+  en círculo de radio 1.00 m, separados 72° entre ellos.
+
+  Cálculo de posiciones (radio r = 1.00 m):
+    CamBot 1: ángulo   0° → x =  1.000, y =  0.000
+    CamBot 2: ángulo  72° → x =  0.309, y =  0.951
+    CamBot 3: ángulo 144° → x = -0.809, y =  0.588
+    CamBot 4: ángulo 216° → x = -0.809, y = -0.588
+    CamBot 5: ángulo 288° → x =  0.309, y = -0.951
+
+  Cada CamBot apunta hacia el centro (yaw = ángulo + 180°):
+    CamBot 1: yaw = 180° = 3.1416 rad
+    CamBot 2: yaw = 252° = 4.3982 rad
+    CamBot 3: yaw = 324° = 5.6549 rad
+    CamBot 4: yaw =  36° = 0.6283 rad
+    CamBot 5: yaw = 108° = 1.8850 rad
+-->
+<launch>
+
+  <arg name="use_sim_time" default="true"/>
+
+  <!-- Mundo vacío con buen fondo para fotos -->
+  <arg name="world" default="$(find-pkg-share autlab3)/worlds/cam.world"/>
+
+  <!-- Servidor Gazebo -->
+  <include file="$(find-pkg-share gazebo_ros)/launch/gzserver.launch.py">
+    <arg name="world" value="$(var world)"/>
+  </include>
+
+  <!-- Cliente Gazebo (ventana visual) -->
+  <include file="$(find-pkg-share gazebo_ros)/launch/gzclient.launch.py"/>
+
+  <!-- Robot state publisher del Turtlebot3 -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/robot_state_publisher.launch.py">
+    <arg name="use_sim_time" value="$(var use_sim_time)"/>
+  </include>
+
+  <!-- Spawn del Turtlebot3 en el CENTRO del mundo (x=0, y=0) -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/spawn_turtlebot3.launch.py">
+    <arg name="x_pose" value="0.0"/>
+    <arg name="y_pose" value="0.0"/>
+  </include>
+
+  <!-- =============================================================
+       CamBot 1 — ángulo   0° → posición (1.00, 0.00)
+  ============================================================= -->
+  <node pkg="gazebo_ros" exec="spawn_entity.py"
+        name="spawn_cambot1"
+        args="-entity cambot1
+              -file $(find-pkg-share autlab3)/urdf/cambot.urdf
+              -robot_namespace cambot1
+              -x  1.000 -y  0.000 -z 0.0
+              -R 0.0 -P 0.0 -Y 3.1416"/>
+
+  <!-- =============================================================
+       CamBot 2 — ángulo  72° → posición (0.309, 0.951)
+  ============================================================= -->
+  <node pkg="gazebo_ros" exec="spawn_entity.py"
+        name="spawn_cambot2"
+        args="-entity cambot2
+              -file $(find-pkg-share autlab3)/urdf/cambot.urdf
+              -robot_namespace cambot2
+              -x  0.309 -y  0.951 -z 0.0
+              -R 0.0 -P 0.0 -Y 4.3982"/>
+
+  <!-- =============================================================
+       CamBot 3 — ángulo 144° → posición (-0.809, 0.588)
+  ============================================================= -->
+  <node pkg="gazebo_ros" exec="spawn_entity.py"
+        name="spawn_cambot3"
+        args="-entity cambot3
+              -file $(find-pkg-share autlab3)/urdf/cambot.urdf
+              -robot_namespace cambot3
+              -x -0.809 -y  0.588 -z 0.0
+              -R 0.0 -P 0.0 -Y 5.6549"/>
+
+  <!-- =============================================================
+       CamBot 4 — ángulo 216° → posición (-0.809, -0.588)
+  ============================================================= -->
+  <node pkg="gazebo_ros" exec="spawn_entity.py"
+        name="spawn_cambot4"
+        args="-entity cambot4
+              -file $(find-pkg-share autlab3)/urdf/cambot.urdf
+              -robot_namespace cambot4
+              -x -0.809 -y -0.588 -z 0.0
+              -R 0.0 -P 0.0 -Y 0.6283"/>
+
+  <!-- =============================================================
+       CamBot 5 — ángulo 288° → posición (0.309, -0.951)
+  ============================================================= -->
+  <node pkg="gazebo_ros" exec="spawn_entity.py"
+        name="spawn_cambot5"
+        args="-entity cambot5
+              -file $(find-pkg-share autlab3)/urdf/cambot.urdf
+              -robot_namespace cambot5
+              -x  0.309 -y -0.951 -z 0.0
+              -R 0.0 -P 0.0 -Y 1.8850"/>
+
+</launch>

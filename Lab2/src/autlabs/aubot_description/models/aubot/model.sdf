@@ -1,0 +1,478 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="aubot">
+  <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+
+    <!-- ==================== Base Footprint ==================== -->
+    <link name="base_footprint"/>
+
+    <!-- ==================== Base Link (flat disk) ==================== -->
+    <link name="base_link">
+      <inertial>
+        <pose>0 0 0.08 0 0 0</pose>
+        <inertia>
+          <ixx>1.5003e-02</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.5003e-02</iyy>
+          <iyz>0</iyz>
+          <izz>3.0000e-02</izz>
+        </inertia>
+        <mass>1.5</mass>
+      </inertial>
+
+      <collision name="base_collision">
+        <pose>0 0 0.08 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.20</radius>
+            <length>0.005</length>
+          </cylinder>
+        </geometry>
+      </collision>
+
+      <visual name="base_visual">
+        <pose>0 0 0.08 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.20</radius>
+            <length>0.005</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.4 0.4 0.4 1.0</ambient>
+          <diffuse>0.4 0.4 0.4 1.0</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ==================== IMU Link ==================== -->
+    <link name="imu_link">
+      <sensor name="aubot_imu" type="imu">
+        <always_on>true</always_on>
+        <update_rate>200</update_rate>
+        <imu>
+          <angular_velocity>
+            <x><noise type="gaussian"><mean>0.0</mean><stddev>2e-4</stddev></noise></x>
+            <y><noise type="gaussian"><mean>0.0</mean><stddev>2e-4</stddev></noise></y>
+            <z><noise type="gaussian"><mean>0.0</mean><stddev>2e-4</stddev></noise></z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></x>
+            <y><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></y>
+            <z><noise type="gaussian"><mean>0.0</mean><stddev>1.7e-2</stddev></noise></z>
+          </linear_acceleration>
+        </imu>
+        <plugin name="aubot_imu" filename="libgazebo_ros_imu_sensor.so">
+          <ros>
+            <remapping>~/out:=imu</remapping>
+          </ros>
+        </plugin>
+      </sensor>
+    </link>
+
+    <!-- ==================== LiDAR (base_scan) ==================== -->
+    <!-- RPLidarA1: 360°, 0.15-12m, 360 samples, 5.5Hz              -->
+    <link name="base_scan">
+      <inertial>
+        <pose>0 0 0.18 0 0 0</pose>
+        <inertia>
+          <ixx>0.001</ixx>
+          <ixy>0.000</ixy>
+          <ixz>0.000</ixz>
+          <iyy>0.001</iyy>
+          <iyz>0.000</iyz>
+          <izz>0.001</izz>
+        </inertia>
+        <mass>0.114</mass>
+      </inertial>
+
+      <collision name="lidar_collision">
+        <pose>0 0 0.18 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.04</length>
+          </cylinder>
+        </geometry>
+      </collision>
+
+      <!-- LiDAR cylinder (blue) -->
+      <visual name="lidar_visual">
+        <pose>0 0 0.18 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.04</radius>
+            <length>0.04</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.0 0.2 0.8 1.0</ambient>
+          <diffuse>0.0 0.2 0.8 1.0</diffuse>
+        </material>
+      </visual>
+
+      <!-- Support column (blue) -->
+      <visual name="lidar_support_visual">
+        <pose>0 0 0.12125 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.01</radius>
+            <length>0.0775</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.0 0.2 0.8 1.0</ambient>
+          <diffuse>0.0 0.2 0.8 1.0</diffuse>
+        </material>
+      </visual>
+
+      <!-- RPLidarA1 sensor -->
+      <sensor name="rplidar_a1" type="ray">
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <pose>0 0 0.18 0 0 0</pose>
+        <update_rate>5.5</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1.000000</resolution>
+              <min_angle>0.000000</min_angle>
+              <max_angle>6.280000</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.150000</min>
+            <max>12.000000</max>
+            <resolution>0.015000</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="aubot_laserscan" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <remapping>~/out:=scan</remapping>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>base_scan</frame_name>
+        </plugin>
+      </sensor>
+    </link>
+
+    <!-- ==================== Left Wheel ==================== -->
+    <link name="wheel_left_link">
+      <inertial>
+        <pose>0 0.204 0.08 -1.5708 0 0</pose>
+        <inertia>
+          <ixx>1.6053e-04</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.6053e-04</iyy>
+          <iyz>0</iyz>
+          <izz>3.2000e-04</izz>
+        </inertia>
+        <mass>0.1</mass>
+      </inertial>
+
+      <collision name="wheel_left_collision">
+        <pose>0 0.204 0.08 -1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>0.008</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>100000</mu>
+              <mu2>100000</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0.0</slip1>
+              <slip2>0.0</slip2>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+5</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+
+      <visual name="wheel_left_visual">
+        <pose>0 0.204 0.08 -1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>0.008</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1.0</ambient>
+          <diffuse>0.1 0.1 0.1 1.0</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ==================== Right Wheel ==================== -->
+    <link name="wheel_right_link">
+      <inertial>
+        <pose>0 -0.204 0.08 -1.5708 0 0</pose>
+        <inertia>
+          <ixx>1.6053e-04</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.6053e-04</iyy>
+          <iyz>0</iyz>
+          <izz>3.2000e-04</izz>
+        </inertia>
+        <mass>0.1</mass>
+      </inertial>
+
+      <collision name="wheel_right_collision">
+        <pose>0 -0.204 0.08 -1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>0.008</length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>100000</mu>
+              <mu2>100000</mu2>
+              <fdir1>0 0 0</fdir1>
+              <slip1>0.0</slip1>
+              <slip2>0.0</slip2>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+5</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+
+      <visual name="wheel_right_visual">
+        <pose>0 -0.204 0.08 -1.5708 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.08</radius>
+            <length>0.008</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1.0</ambient>
+          <diffuse>0.1 0.1 0.1 1.0</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ==================== Caster Front ==================== -->
+    <link name="caster_front_link">
+      <pose>0.18 0 0.005 0 0 0</pose>
+      <inertial>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00001</iyy>
+          <iyz>0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <collision name="caster_front_collision">
+        <geometry>
+          <sphere>
+            <radius>0.005</radius>
+          </sphere>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+5</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name="caster_front_visual">
+        <pose>0 0 -0.0025 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.005</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.6 0.6 0.6 1.0</ambient>
+          <diffuse>0.6 0.6 0.6 1.0</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ==================== Caster Back ==================== -->
+    <link name="caster_back_link">
+      <pose>-0.18 0 0.005 0 0 0</pose>
+      <inertial>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00001</iyy>
+          <iyz>0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <collision name="caster_back_collision">
+        <geometry>
+          <sphere>
+            <radius>0.005</radius>
+          </sphere>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+5</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name="caster_back_visual">
+        <pose>0 0 -0.0025 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.04 0.04 0.005</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.6 0.6 0.6 1.0</ambient>
+          <diffuse>0.6 0.6 0.6 1.0</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- ==================== Joints ==================== -->
+    <joint name="base_joint" type="fixed">
+      <parent>base_footprint</parent>
+      <child>base_link</child>
+      <pose>0 0 0.08 0 0 0</pose>
+    </joint>
+
+    <joint name="wheel_left_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>wheel_left_link</child>
+      <pose>0 0.204 0.08 -1.5708 0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <joint name="wheel_right_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>wheel_right_link</child>
+      <pose>0 -0.204 0.08 -1.5708 0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <joint name="caster_front_joint" type="ball">
+      <parent>base_link</parent>
+      <child>caster_front_link</child>
+    </joint>
+
+    <joint name="caster_back_joint" type="ball">
+      <parent>base_link</parent>
+      <child>caster_back_link</child>
+    </joint>
+
+    <joint name="imu_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>imu_link</child>
+      <pose>0 0 0.085 0 0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <joint name="scan_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>base_scan</child>
+      <pose>0 0 0.18 0 0 0</pose>
+      <axis>
+        <xyz>0 0 1</xyz>
+      </axis>
+    </joint>
+
+    <!-- ==================== Diff Drive Plugin (Act 1.3) ==================== -->
+    <plugin name="aubot_diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <ros>
+        <!-- <namespace>/aubot</namespace> -->
+      </ros>
+
+      <update_rate>30</update_rate>
+
+      <!-- Wheels -->
+      <left_joint>wheel_left_joint</left_joint>
+      <right_joint>wheel_right_joint</right_joint>
+
+      <!-- Kinematics -->
+      <wheel_separation>0.408</wheel_separation>
+      <wheel_diameter>0.16</wheel_diameter>
+
+      <!-- Limits -->
+      <max_wheel_torque>20</max_wheel_torque>
+      <max_wheel_acceleration>1.0</max_wheel_acceleration>
+
+      <command_topic>cmd_vel</command_topic>
+
+      <!-- Output -->
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>false</publish_wheel_tf>
+
+      <odometry_topic>odom</odometry_topic>
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
+    </plugin>
+
+    <!-- ==================== Joint State Publisher ==================== -->
+    <plugin name="aubot_joint_state" filename="libgazebo_ros_joint_state_publisher.so">
+      <ros>
+        <remapping>~/out:=joint_states</remapping>
+      </ros>
+      <update_rate>30</update_rate>
+      <joint_name>wheel_left_joint</joint_name>
+      <joint_name>wheel_right_joint</joint_name>
+    </plugin>
+
+  </model>
+</sdf>

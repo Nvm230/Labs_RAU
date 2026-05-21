@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="model_path" default="$(find-pkg-share autlab3)/models/marble_8cm/model.sdf"/>
+
+  <!-- Arguments -->
+  <arg name="use_sim_time" default="true"/>
+  <arg name="x_pose" default="-0.7"/>
+  <arg name="y_pose" default="0.0"/>
+
+  <!-- World file -->
+  <arg name="world" default="$(find-pkg-share autlab3)/worlds/turtlebot3_world1.world"/>
+
+  <!-- Gazebo server -->
+  <include file="$(find-pkg-share gazebo_ros)/launch/gzserver.launch.py">
+    <arg name="world" value="$(var world)"/>
+  </include>
+
+  <!-- Gazebo client -->
+  <include file="$(find-pkg-share gazebo_ros)/launch/gzclient.launch.py"/>
+
+  <!-- Robot state publisher -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/robot_state_publisher.launch.py">
+    <arg name="use_sim_time" value="$(var use_sim_time)"/>
+  </include>
+
+  <!-- Spawn TurtleBot3 -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/spawn_turtlebot3.launch.py">
+    <arg name="x_pose" value="$(var x_pose)"/>
+    <arg name="y_pose" value="$(var y_pose)"/>
+  </include>
+
+  <node pkg="gazebo_ros" exec="spawn_entity.py" args="-entity marble_8cm_1 -file $(var model_path) -x  1.0 -y  1.0 -z 0.05"/>
+  <node pkg="gazebo_ros" exec="spawn_entity.py" args="-entity marble_8cm_2 -file $(var model_path) -x  1.0 -y -2.0 -z 0.05"/>
+  <node pkg="gazebo_ros" exec="spawn_entity.py" args="-entity marble_8cm_3 -file $(var model_path) -x  2.0 -y  0.0 -z 0.05"/>
+  <node pkg="gazebo_ros" exec="spawn_entity.py" args="-entity marble_8cm_4 -file $(var model_path) -x  0.0 -y  2.0 -z 0.05"/>
+  <node pkg="gazebo_ros" exec="spawn_entity.py" args="-entity marble_8cm_5 -file $(var model_path) -x -2.0 -y  1.0 -z 0.05"/>
+  <node pkg="gazebo_ros" exec="spawn_entity.py" args="-entity marble_8cm_6 -file $(var model_path) -x -1.0 -y -2.0 -z 0.05"/>
+ 
+  <!--node pkg="gazebo_ros" exec="spawn_entity.py" args="-entity coke_can6 -database coke_can -x -1.0 -y -2.0 -z 0.2"/-->
+ 
+</launch>

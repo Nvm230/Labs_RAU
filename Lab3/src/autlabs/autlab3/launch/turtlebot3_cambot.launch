@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+  Launch file Actividad 2 - Lab 3
+  Lanza el mundo de Gazebo con el Turtlebot3 y 3 CamBots
+  colocados en un círculo de radio 0.30 m separados 120° cada uno.
+
+  Posiciones de los 3 CamBots (radio = 0.30 m):
+    CamBot 1:  0°   → x= 0.30, y= 0.00
+    CamBot 2: 120°  → x=-0.15, y= 0.26
+    CamBot 3: 240°  → x=-0.15, y=-0.26
+-->
+<launch>
+
+  <!-- ---- Parámetros generales ---- -->
+  <arg name="use_sim_time" default="true"/>
+  <arg name="x_turtle"    default="-0.7"/>
+  <arg name="y_turtle"    default="0.0"/>
+
+  <!-- ---- Mundo de Gazebo ---- -->
+  <arg name="world" default="$(find-pkg-share autlab3)/worlds/turtlebot3_world1.world"/>
+
+  <!-- ---- Servidor de Gazebo ---- -->
+  <include file="$(find-pkg-share gazebo_ros)/launch/gzserver.launch.py">
+    <arg name="world" value="$(var world)"/>
+  </include>
+
+  <!-- ---- Cliente de Gazebo (ventana visual) ---- -->
+  <include file="$(find-pkg-share gazebo_ros)/launch/gzclient.launch.py"/>
+
+  <!-- ---- Robot state publisher del Turtlebot3 ---- -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/robot_state_publisher.launch.py">
+    <arg name="use_sim_time" value="$(var use_sim_time)"/>
+  </include>
+
+  <!-- ---- Spawn del Turtlebot3 en el centro ---- -->
+  <include file="$(find-pkg-share turtlebot3_gazebo)/launch/spawn_turtlebot3.launch.py">
+    <arg name="x_pose" value="$(var x_turtle)"/>
+    <arg name="y_pose" value="$(var y_turtle)"/>
+  </include>
+
+  <!-- ================================================================
+       CamBot 1 — ángulo  0° → (x= 0.30, y= 0.00)
+       Orientación: yaw = 180° (π rad) para que mire hacia el centro
+  ================================================================ -->
+  <node pkg="gazebo_ros" exec="spawn_entity.py"
+        args="-entity cambot1
+              -file $(find-pkg-share autlab3)/urdf/cambot.urdf
+              -robot_namespace cambot1
+              -x  0.30 -y  0.00 -z 0.0
+              -R 0 -P 0 -Y 3.1416"
+        name="spawn_cambot1"/>
+
+  <!-- ================================================================
+       CamBot 2 — ángulo 120° → (x=-0.15, y= 0.26)
+       Orientación: yaw = 300° (5.236 rad) → mirando al centro
+  ================================================================ -->
+  <node pkg="gazebo_ros" exec="spawn_entity.py"
+        args="-entity cambot2
+              -file $(find-pkg-share autlab3)/urdf/cambot.urdf
+              -robot_namespace cambot2
+              -x -0.15 -y  0.26 -z 0.0
+              -R 0 -P 0 -Y 5.2360"
+        name="spawn_cambot2"/>
+
+  <!-- ================================================================
+       CamBot 3 — ángulo 240° → (x=-0.15, y=-0.26)
+       Orientación: yaw = 60° (1.047 rad) → mirando al centro
+  ================================================================ -->
+  <node pkg="gazebo_ros" exec="spawn_entity.py"
+        args="-entity cambot3
+              -file $(find-pkg-share autlab3)/urdf/cambot.urdf
+              -robot_namespace cambot3
+              -x -0.15 -y -0.26 -z 0.0
+              -R 0 -P 0 -Y 1.0472"
+        name="spawn_cambot3"/>
+
+</launch>

@@ -1,0 +1,59 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- The table -->
+    <include>
+      <uri>model://cafe_table</uri>
+      <name>table</name>
+      <pose>1.0 0 0 0 0 0</pose>
+    </include>
+
+    <!-- Objects on the table -->
+    <include>
+      <uri>model://coke_can</uri>
+      <name>coke_can_1</name>
+      <pose>0.9 0.1 0.8 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_10cm</uri>
+      <name>wood_cube_1</name>
+      <pose>1.0 0.0 0.8 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://arm_part</uri>
+      <name>arm_part_1</name>
+      <pose>1.1 0.0 0.8 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://cross_joint_part</uri>
+      <name>cross_joint_part_1</name>
+      <pose>1.0 -0.2 0.8 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://gear_part</uri>
+      <name>gear_part_1</name>
+      <pose>0.9 -0.1 0.8 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://cricket_ball</uri>
+      <name>cricket_ball_1</name>
+      <pose>1.1 0.1 0.8 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>

@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!--
+  URDF del CamBot: Un robot fijo (sin ruedas) con:
+    - Base cuadrada pequeña (soporte en el suelo)
+    - Poste vertical de 1 metro de altura
+    - Cámara en la punta del poste mirando hacia abajo-adelante
+
+  Se colocarán 3 de estos robots en círculo alrededor del Turtlebot3
+  para fotografiarlo desde distintos ángulos.
+-->
+<robot name="cambot">
+
+  <!-- ======================== BASE ======================== -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <!-- Caja pequeña que hace de base/soporte -->
+        <box size="0.15 0.15 0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025" rpy="0 0 0"/>
+      <material name="gris">
+        <color rgba="0.4 0.4 0.4 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.15 0.15 0.05"/>
+      </geometry>
+      <origin xyz="0 0 0.025" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+               iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <!-- ======================== POSTE ======================== -->
+  <link name="poste_link">
+    <visual>
+      <geometry>
+        <!-- Un cilindro que hará de poste de la cámara -->
+        <cylinder radius="0.015" length="0.30"/>
+      </geometry>
+      <!-- Desplazamos el cilindro hacia arriba la mitad de su longitud -->
+      <origin xyz="0 0 0.15" rpy="0 0 0"/>
+      <material name="negro">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.015" length="0.30"/>
+      </geometry>
+      <origin xyz="0 0 0.15" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.04" ixy="0.0" ixz="0.0"
+               iyy="0.04" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <!-- Une la base con el poste -->
+  <joint name="base_a_poste" type="fixed">
+    <parent link="base_link"/>
+    <child  link="poste_link"/>
+    <!-- El poste arranca desde la parte superior de la base (z=0.05) -->
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ======================== CÁMARA ======================== -->
+  <link name="camera_link">
+    <visual>
+      <geometry>
+        <!-- Pequeña caja que representa la cámara -->
+        <box size="0.05 0.05 0.03"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="rojo">
+        <color rgba="0.8 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.05 0.05 0.03"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.00001" ixy="0.0" ixz="0.0"
+               iyy="0.00001" iyz="0.0" izz="0.00001"/>
+    </inertial>
+  </link>
+
+  <!-- La cámara va en la punta del poste, apuntando ~15.6° hacia abajo -->
+  <joint name="poste_a_camara" type="fixed">
+    <parent link="poste_link"/>
+    <child  link="camera_link"/>
+    <!-- Arriba del poste: z=0.30 desde el joint base→poste -->
+    <origin xyz="0 0 0.30" rpy="0 0.273 0"/>
+    <!-- 0.273 rad ≈ 15.6 grados → centra el robot a ras de suelo a 1m de distancia -->
+  </joint>
+
+  <!-- ======================== ÓPTICA DE LA CÁMARA ======================== -->
+  <!--
+    Gazebo necesita este link especial para el sensor de cámara.
+    Debe estar rotado -90° en Y y -90° en Z para que el eje Z de la cámara
+    apunte hacia donde "mira".
+  -->
+  <link name="camera_optical_link"/>
+
+  <joint name="camara_a_optica" type="fixed">
+    <parent link="camera_link"/>
+    <child  link="camera_optical_link"/>
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+  </joint>
+
+  <!-- ======================== PLUGIN GAZEBO ======================== -->
+  <gazebo reference="camera_link">
+    <sensor type="camera" name="cambot_camera">
+      <update_rate>10.0</update_rate>
+      <camera name="cambot_cam">
+        <horizontal_fov>0.80</horizontal_fov>   <!-- ≈ 45.8° para enmarcar al robot completamente a pesar de su geometría asimétrica -->
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <!-- Ruido gaussiano en la imagen (Act2 requiere agregar ruido) -->
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>  <!-- desviación estándar pequeña para ruido sutil -->
+        </noise>
+      </camera>
+      <!-- Plugin que publica en ROS2 -->
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <ros>
+          <remapping>image_raw:=camera/image_raw</remapping>
+          <remapping>camera_info:=camera/camera_info</remapping>
+        </ros>
+        <camera_name>cambot_camera</camera_name>
+        <frame_name>camera_optical_link</frame_name>
+      </plugin>
+      <always_on>1</always_on>
+      <visualize>true</visualize>
+    </sensor>
+  </gazebo>
+
+  <!-- Hacemos que el robot esté fijo al mundo (no tiene ruedas) -->
+  <gazebo>
+    <static>true</static>
+  </gazebo>
+
+</robot>

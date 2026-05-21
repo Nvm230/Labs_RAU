@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="model" default="$(find-pkg-share merakm)/urdf/diff_robot.urdf" />
+  
+  <include file="$(find-pkg-share gazebo_ros)/launch/gazebo.launch.py">
+    <arg name="world" value="$(find-pkg-share autlab3)/worlds/turtlebot3_world1.world"/>
+    <arg name="paused" value="true"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+    <arg name="verbose" value="true"/>
+  </include>
+
+  <node pkg="gazebo_ros" exec="spawn_entity.py" output="screen" args="-file $(var model) -x -0.7 -y 0.0 -z 0.0 -entity merakm"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" exec="robot_state_publisher" output="screen">
+    <param name="robot_description" value="$(command 'cat $(var model)')"/>
+    <param name="use_sim_time" value="true" />
+  </node>
+
+</launch>
