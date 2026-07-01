@@ -1,0 +1,30 @@
+<launch>
+
+    <arg name="filtro" default="odom_ekf"/>
+
+    <!-- Nodo de filtro -->
+    <node
+        pkg="robot_localization"
+        exec="ukf_node"
+        name="ukf_filter_node"
+        output="screen">
+
+        <param name="use_sim_time" value="false"/>
+
+        <param from="$(find-pkg-share autlab7)/config/$(var filtro).yaml"/>
+
+        <remap from="/odometry/filtered" to="/odom/$(var filtro)"/>
+
+
+    </node>
+
+
+    <!-- Nodo de movimiento y record -->
+    <node
+        pkg="autlab7"
+        exec="$(var filtro)"
+        name="$(var filtro)"
+        output="screen"/>
+
+
+</launch>

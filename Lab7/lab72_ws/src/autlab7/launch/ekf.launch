@@ -1,0 +1,7 @@
+<launch>
+
+  <node pkg="robot_localization" exec="ekf_node" name="ekf_filter_node" output="screen">
+    <param from="$(find-pkg-share autlab7)/config/ekf.yaml"/>
+  </node>
+
+</launch>

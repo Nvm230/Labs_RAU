@@ -1,0 +1,38 @@
+ekf_filter_node:
+  ros__parameters:
+    frequency: 30.0
+    sensor_timeout: 0.1
+    two_d_mode: true
+    transform_time_offset: 0.0
+    transform_timeout: 0.0
+    print_diagnostics: true
+    debug: false
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_footprint
+    world_frame: odom
+
+    # Configuración de Odometría
+    odom0: /odom
+    odom0_config: [false, false, false, # x, y, z positions
+                  false, false, false, # roll, pitch, yaw angles
+                  true,  true,  true,  # x, y, z velocities
+                  false, false, true,  # roll, pitch, yaw velocities
+                  false, false, false] # x, y, z accelerations
+    odom0_queue_size: 5
+    odom0_nodelay: true
+    odom0_differential: false
+    odom0_relative: false
+
+    imu0: /imu/data
+    imu0_config: [false, false, false,  # x, y, z positions
+                  true,  true,  false,  # roll, pitch, yaw angles
+                  false, false, false,  # x, y, z velocities
+                  true,  true,  true,   # roll, pitch, yaw velocities
+                  true,  true,  true]   # x, y, z accelerations
+    imu0_queue_size: 5
+    imu0_nodelay: true
+    imu0_differential: false
+    imu0_relative: false
+    imu0_remove_gravitational_acceleration: false
